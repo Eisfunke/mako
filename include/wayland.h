@@ -16,6 +16,7 @@ struct mako_output {
 	struct wl_list link; // mako_state::outputs
 
 	char *name;
+	char *description;
 	enum wl_output_subpixel subpixel;
 	int32_t scale;
 };

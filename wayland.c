@@ -36,13 +36,19 @@ static void output_handle_name(void *data, struct wl_output *wl_output,
 	output->name = strdup(name);
 }
 
+static void output_handle_description(void *data, struct wl_output *wl_output,
+		const char *description) {
+	struct mako_output *output = data;
+	output->description = strdup(description);
+}
+
 static const struct wl_output_listener output_listener = {
 	.geometry = output_handle_geometry,
 	.mode = noop,
 	.done = noop,
 	.scale = output_handle_scale,
 	.name = output_handle_name,
-	.description = noop,
+	.description = output_handle_description,
 };
 
 static void send_frame(struct mako_surface *surface);
@@ -88,6 +94,7 @@ static void destroy_output(struct mako_output *output) {
 	wl_list_remove(&output->link);
 	wl_output_destroy(output->wl_output);
 	free(output->name);
+	free(output->description);
 	free(output);
 }
 
@@ -576,7 +583,9 @@ static struct mako_output *get_configured_output(struct mako_surface *surface) {
 
 	struct mako_output *output;
 	wl_list_for_each(output, &surface->state->outputs, link) {
-		if (output->name != NULL && strcmp(output->name, output_name) == 0) {
+		printf("Output description: %s\n", output->description);
+		if ((output->name != NULL && strcmp(output->name, output_name) == 0) ||
+				(output->description != NULL && strcmp(output->description, output_name) == 0)) {
 			return output;
 		}
 	}
